@@ -4,26 +4,23 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateTodos extends Migration
+class CreateCategories extends Migration
 {
     public function up()
     {
         $this->forge->addField([
             'id' => ['type' => 'INT', 'auto_increment' => true],
-            'title' => ['type' => 'VARCHAR', 'constraint' => 255],
-            'description' => ['type' => 'TEXT', 'null' => true],
-            'completed' => ['type' => 'BOOLEAN', 'default' => false],
-            'category_id' => ['type' => 'INT'],
+            'name' => ['type' => 'VARCHAR', 'constraint' => 100],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
             'updated_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->createTable('todos');
+        $this->forge->createTable('categories');
     }
 
     public function down()
     {
-        $this->forge->dropTable('todos');
+        $this->forge->dropTable('categories');
     }
 }
