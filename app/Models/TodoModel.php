@@ -12,7 +12,7 @@ class TodoModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
-    protected $allowedFields = ['version'];
+    protected $allowedFields = ['version', 'class', 'id','group', 'namespace','time','batch'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -28,7 +28,10 @@ class TodoModel extends Model
     protected $deletedField = 'deleted_at';
 
     // Validation
-    protected $validationRules = [];
+    protected $validationRules = [
+        'version' => 'required|alpha_numeric_length|min_length'
+
+    ];
     protected $validationMessages = [];
     protected $skipValidation = false;
     protected $cleanValidationRules = true;
