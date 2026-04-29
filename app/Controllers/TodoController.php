@@ -7,6 +7,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class TodoController extends BaseController
 {
+    
+
     public function index(Request $request)
     {
         $query = Todo::query();
@@ -58,4 +60,8 @@ class TodoController extends BaseController
         return response()->json(['message' => 'deleted']);
     }
 }
+
+
+
+
 
