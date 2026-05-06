@@ -12,15 +12,20 @@ class ApiKeyFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        $key = $request->getHeaderLine('X-API-KEY');
+        $key = $request->getHeaderLine('X-API-KEY')
+            ?? $request->getGet('key');
 
         $model = new ApiKeyModel();
+        $apiKeyData = $model->where('key', $key)->first();
 
-        if (!$model->where('key', $key)->first()) {
-            return service('response')->setStatusCode(401)->setJSON(['error'=>'Invalid API Key']);
+        if (!$key || !$apiKeyData) {
+            return service('response')
+                ->setStatusCode(401)
+                ->setJSON(['error' => 'Invalid API Key']);
         }
 
-        service('request')->apiKey = $key;
+        $request->apiKey = $key;
+        $request->apiUser = $apiKeyData['user'] ?? null;
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
@@ -28,10 +33,11 @@ class ApiKeyFilter implements FilterInterface
         $log = new LogModel();
 
         $log->insert([
-            'method' => $request->getMethod(),
+            'method'   => $request->getMethod(),
             'endpoint' => current_url(),
-            'status' => $response->getStatusCode(),
-            'api_key' => $request->apiKey ?? null
+            'status'   => $response->getStatusCode(),
+            'api_key'  => $request->apiKey ?? null,
+            'user'     => $request->apiUser ?? null
         ]);
     }
 }
