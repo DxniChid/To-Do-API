@@ -12,7 +12,7 @@ class ApiKeyFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        $key = $request->getHeaderLine('X-API-KEY') ?: $request->getGet('key');
+        $key = $request->getHeaderLine('X-API-KEY');
 
         $model = new ApiKeyModel();
 
