@@ -2,60 +2,91 @@
 
 namespace App\Controllers;
 
-use App\Controllers\BaseController;
-use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\RESTful\ResourceController;
+use App\Models\TodoModel;
 
-class TodoController extends BaseController
+class TodoController extends ResourceController
 {
-    public function index(Request $request)
+    protected $modelName = TodoModel::class;
+    protected $format = 'json';
+
+    // GET /todos
+    public function index()
     {
-        $query = Todo::query();
+        $model = new TodoModel();
 
-        // Filtering
-        if ($request->category_id) {
-            $query->where('category_id', $request->category_id);
+        $limit = $this->request->getGet('limit') ?? 10;
+
+        $query = $model;
+
+        // FILTER
+        if ($this->request->getGet('category_id')) {
+            $query = $query->where(
+                'category_id',
+                $this->request->getGet('category_id')
+            );
         }
 
-        // Sorting
-        if ($request->order_by === 'date') {
-            $query->orderBy('created_at', 'desc');
+        // SORT
+        if ($this->request->getGet('order_by') === 'date') {
+            $query = $query->orderBy('created_at', 'DESC');
         }
 
-    
-        $limit = $request->limit ?? 10;
-
-        return response()->json(
+        return $this->respond(
             $query->paginate($limit)
         );
     }
-        public function store(Request $request)
+
+    public function create()
     {
-        $request->validate([
-            'title' => 'required|min:3',
-            'category_id' => 'required|exists:categories,id'
-        ]);
+        $model = new TodoModel();
 
-        return Todo::create($request->all());
-    }
-        public function update(Request $request, $id)
-    {
-        $todo = Todo::findOrFail($id);
+        $data = $this->request->getJSON(true);
 
-        $todo->update($request->only([
-            'title',
-            'description',
-            'completed'
-        ]));
+        if (!isset($data['title']) || strlen($data['title']) < 3) {
+            return $this->failValidationErrors('Title must be at least 3 characters');
+        }
 
-        return $todo;
+        if (!isset($data['category_id'])) {
+            return $this->failValidationErrors('category_id required');
+        }
+
+        $model->insert($data);
+
+        return $this->respondCreated($data);
     }
 
-        public function destroy($id)
+    // PUT /todos/{id}
+    public function update($id = null)
     {
-        $todo = Todo::findOrFail($id);
-        $todo->delete();
+        $model = new TodoModel();
 
-        return response()->json(['message' => 'deleted']);
+        $todo = $model->find($id);
+
+        if (!$todo) {
+            return $this->failNotFound('Todo not found');
+        }
+
+        $data = $this->request->getJSON(true);
+
+        $model->update($id, $data);
+
+        return $this->respond(['message' => 'updated']);
+    }
+
+    // DELETE /todos/{id}
+    public function delete($id = null)
+    {
+        $model = new TodoModel();
+
+        $todo = $model->find($id);
+
+        if (!$todo) {
+            return $this->failNotFound('Todo not found');
+        }
+
+        $model->delete($id);
+
+        return $this->respondDeleted(['message' => 'deleted']);
     }
 }
-

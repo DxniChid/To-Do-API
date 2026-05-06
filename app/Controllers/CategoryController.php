@@ -2,24 +2,34 @@
 
 namespace App\Controllers;
 
-use App\Controllers\BaseController;
-use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\RESTful\ResourceController;
+use App\Models\CategoryModel;
+use App\Models\TodoModel;
 
-class CategoryController extends BaseController
+class CategoryController extends ResourceController
 {
-    public function destroy($id)
-    {
-        $category = Category::findOrFail($id);
+    protected $modelName = CategoryModel::class;
+    protected $format = 'json';
 
-        if ($category->todos()->count() > 0) {
-            return response()->json([
-                'error' => 'Category not empty'
-            ], 409);
+    public function delete($id = null)
+    {
+        $categoryModel = new CategoryModel();
+        $todoModel = new TodoModel();
+
+        $category = $categoryModel->find($id);
+
+        if (!$category) {
+            return $this->failNotFound('Category not found');
         }
 
-        $category->delete();
+        $count = $todoModel->where('category_id', $id)->countAllResults();
 
-        return response()->json(['message' => 'deleted']);
+        if ($count > 0) {
+            return $this->fail('Category not empty', 409);
+        }
+
+        $categoryModel->delete($id);
+
+        return $this->respondDeleted(['message' => 'deleted']);
     }
 }
-
