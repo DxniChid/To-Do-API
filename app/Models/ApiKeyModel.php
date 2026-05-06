@@ -7,5 +7,5 @@ use CodeIgniter\Model;
 class ApiKeyModel extends Model
 {
     protected $table = 'api_keys';
-    protected $allowedFields = ['key', 'name'];
+    protected $allowedFields = ['key', 'user'];
 }

@@ -11,25 +11,14 @@ class CategoryController extends ResourceController
     protected $modelName = CategoryModel::class;
     protected $format = 'json';
 
-    public function delete($id = null)
+    public function delete($id=null)
     {
-        $categoryModel = new CategoryModel();
-        $todoModel = new TodoModel();
+        $todo = new TodoModel();
 
-        $category = $categoryModel->find($id);
-
-        if (!$category) {
-            return $this->failNotFound('Category not found');
+        if ($todo->where('category_id',$id)->countAllResults()>0) {
+            return $this->fail('Category not empty',409);
         }
 
-        $count = $todoModel->where('category_id', $id)->countAllResults();
-
-        if ($count > 0) {
-            return $this->fail('Category not empty', 409);
-        }
-
-        $categoryModel->delete($id);
-
-        return $this->respondDeleted(['message' => 'deleted']);
+        return $this->respondDeleted($this->model->delete($id));
     }
 }
