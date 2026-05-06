@@ -38,7 +38,7 @@ class AuthJWT extends ShieldAuthJWT
      * @var array<string, string>
      */
     public array $defaultClaims = [
-        'iss' => '<Issuer of the JWT>',
+        'iss' => 'http://localhost:8080',
     ];
 
     /**
@@ -91,5 +91,5 @@ class AuthJWT extends ShieldAuthJWT
      * - Auth::RECORD_LOGIN_ATTEMPT_FAILURE
      * - Auth::RECORD_LOGIN_ATTEMPT_ALL
      */
-    public int $recordLoginAttempt = Auth::RECORD_LOGIN_ATTEMPT_FAILURE;
+    public int $recordLoginAttempt = Auth::RECORD_LOGIN_ATTEMPT_ALL;
 }

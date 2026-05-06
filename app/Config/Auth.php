@@ -147,8 +147,8 @@ class Auth extends ShieldAuth
     public array $authenticationChain = [
         'session',
         'tokens',
-        'hmac',
-        // 'jwt',
+        'jwt',
+        //'hmac',
     ];
 
     /**
