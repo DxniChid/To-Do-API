@@ -5,6 +5,5 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
-
+$routes->post('auth/jwt', '\App\Controllers\Auth\LoginController::jwtLogin');
 service('auth')->routes($routes);
