@@ -1,0 +1,281 @@
+# ============================================
+# CodeIgniter 4 - Todo API Konfiguration
+# Basierend auf deinem bestehenden Projekt
+# ============================================
+# ============================================
+
+app:
+  name: TodoApp
+  environment: development
+  baseURL: http://localhost:8080/
+  timezone: Europe/Zurich
+  language: de
+
+# ============================================
+# Datenbank-Konfiguration
+# ============================================
+database:
+  default:
+    hostname: localhost
+    database: todo_app
+    username: root
+    password: ""
+    DBDriver: MySQLi
+    DBPrefix: ""
+    port: 3306
+    charset: utf8mb4
+    DBCollat: utf8mb4_general_ci
+
+# ============================================
+# Tabellen / Modelle
+# ============================================
+models:
+  CategoryModel:
+    file: app/Models/CategoryModel.php
+    table: categories
+    primaryKey: id
+    allowedFields:
+      - name
+      - color
+      - created_at
+      - updated_at
+    useTimestamps: true
+
+  TodoModel:
+    file: app/Models/TodoModel.php
+    table: todos
+    primaryKey: id
+    allowedFields:
+      - category_id
+      - title
+      - description
+      - status
+      - priority
+      - due_date
+      - created_at
+      - updated_at
+    useTimestamps: true
+
+  ApiKeyModel:
+    file: app/Models/ApiKeyModel.php
+    table: api_keys
+
+  LogModel:
+    file: app/Models/LogModel.php
+    table: logs
+
+# ============================================
+# Controller
+# ============================================
+controllers:
+  CategoryController:
+    file: app/Controllers/CategoryController.php
+    methods:
+      - index
+      - show
+      - create
+      - update
+      - delete
+
+  TodoController:
+    file: app/Controllers/TodoController.php
+    methods:
+      - index
+      - show
+      - create
+      - update
+      - delete
+
+  AuthController:
+    file: app/Controllers/AuthController.php
+    methods:
+      - login
+      - register
+      - logout
+
+# ============================================
+# Migrationen
+# ============================================
+migrations:
+  categories:
+    fields:
+      id:
+        type: INT
+        constraint: 11
+        auto_increment: true
+      name:
+        type: VARCHAR
+        constraint: 255
+      color:
+        type: VARCHAR
+        constraint: 20
+        default: "#3498db"
+      created_at:
+        type: DATETIME
+        null: true
+      updated_at:
+        type: DATETIME
+        null: true
+
+  tasks:
+    fields:
+      id:
+        type: INT
+        constraint: 11
+        auto_increment: true
+      category_id:
+        type: INT
+        constraint: 11
+      title:
+        type: VARCHAR
+        constraint: 255
+      description:
+        type: TEXT
+        null: true
+      status:
+        type: ENUM
+        values:
+          - offen
+          - in_bearbeitung
+          - erledigt
+        default: offen
+      priority:
+        type: ENUM
+        values:
+          - niedrig
+          - mittel
+          - hoch
+        default: mittel
+      due_date:
+        type: DATE
+        null: true
+      created_at:
+        type: DATETIME
+        null: true
+      updated_at:
+        type: DATETIME
+        null: true
+
+# ============================================
+# API-Routen
+# ============================================
+routes:
+  categories:
+    - method: GET
+      path: /categories
+      controller: CategoryController::index
+
+    - method: POST
+      path: /categories
+      controller: CategoryController::create
+
+    - method: PUT
+      path: /categories/{id}
+      controller: CategoryController::update
+
+    - method: DELETE
+      path: /categories/{id}
+      controller: CategoryController::delete
+
+  todos:
+    - method: GET
+      path: /todos
+      controller: TodoController::index
+
+    - method: POST
+      path: /todos
+      controller: TodoController::create
+
+    - method: PUT
+      path: /todos/{id}
+      controller: TodoController::update
+
+    - method: DELETE
+      path: /todos/{id}
+      controller: TodoController::delete
+
+  auth:
+    - method: POST
+      path: /login
+      controller: AuthController::login
+
+    - method: POST
+      path: /register
+      controller: AuthController::register
+
+# ============================================
+# Validierungsregeln
+# ============================================
+validation:
+  category:
+    name:
+      rules: required|min_length[3]|max_length[255]
+    color:
+      rules: required
+
+  task:
+    title:
+      rules: required|min_length[3]|max_length[255]
+    status:
+      rules: required
+    priority:
+      rules: required
+
+# ============================================
+# Sicherheit
+# ============================================
+security:
+  csrfProtection: true
+  sessionDriver: CodeIgniter\\Session\\Handlers\\FileHandler
+  sessionExpiration: 7200
+
+# ============================================
+# Logging
+# ============================================
+logging:
+  threshold: 4
+  path: writable/logs/
+
+# ============================================
+# Features
+# ============================================
+features:
+  authentication:
+    enabled: true
+    api_keys: true
+    jwt_support: false
+
+  logging:
+    enabled: true
+    request_logs: true
+
+  categories:
+    enabled: true
+    color_support: true
+
+  todos:
+    enabled: true
+    priorities: true
+    due_dates: true
+    status_tracking: true
+
+# ============================================
+# Projektstruktur
+# ============================================
+project_structure:
+  controllers: app/Controllers
+  models: app/Models
+  migrations: app/Database/Migrations
+  public: public/
+  writable: writable/
+  tests: tests/
+
+# ============================================
+# Frontend
+# ============================================
+frontend:
+  framework: Bootstrap 5
+  icons: FontAwesome
+  theme:
+    primary_color: "#3498db"
+    dark_mode: false
