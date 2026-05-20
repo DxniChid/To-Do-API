@@ -17,11 +17,11 @@ class TodoController extends ResourceController
 
         $limit = $this->request->getGet('limit') ?? 10;
 
-        $query = $model;
+        $builder = $this->model;
 
         // FILTER
         if ($this->request->getGet('category_id')) {
-            $query = $query->where(
+            $builder = $builder->where(...)(
                 'category_id',
                 $this->request->getGet('category_id')
             );
@@ -29,12 +29,10 @@ class TodoController extends ResourceController
 
         // SORT
         if ($this->request->getGet('order_by') === 'date') {
-            $query = $query->orderBy('created_at', 'DESC');
+            $builder = $builder->orderBy('created_at', 'DESC');
         }
 
-        return $this->respond(
-            $query->paginate($limit)
-        );
+        return $this->respond($builder->paginate($limit));
     }
 
     public function create()
@@ -43,13 +41,14 @@ class TodoController extends ResourceController
 
         $data = $this->request->getJSON(true);
 
-        if (!isset($data['title']) || strlen($data['title']) < 3) {
-            return $this->failValidationErrors('Title must be at least 3 characters');
-        }
-
-        if (!isset($data['category_id'])) {
-            return $this->failValidationErrors('category_id required');
-        }
+    if (! $this->validate([
+            'title' => 'required|min_length[3]',
+            'category_id' => 'required|integer'
+    ])) {
+    return $this->failValidationErrors($this->validator->getErrors());
+}
+        $data['title'] = trim($data['title']);
+        $data['category_id'] = (int) $data['category_id'];
 
         $model->insert($data);
 
@@ -59,6 +58,11 @@ class TodoController extends ResourceController
     // PUT /todos/{id}
     public function update($id = null)
     {
+        if (!is_numeric($id)) {
+        return $this->failValidationErrors([
+        'id' => 'Invalid ID'
+        ]);
+    }  
         $model = new TodoModel();
 
         $todo = $model->find($id);
@@ -68,6 +72,15 @@ class TodoController extends ResourceController
         }
 
         $data = $this->request->getJSON(true);
+
+        if (! $this->validate([
+            'title' => 'permit_empty|min_length[3]',
+            'category_id' => 'permit_empty|integer'
+    ])) {
+
+    return $this->failValidationErrors($this->validator->getErrors());
+}
+        
 
         $model->update($id, $data);
 

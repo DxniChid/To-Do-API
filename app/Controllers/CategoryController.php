@@ -13,6 +13,14 @@ class CategoryController extends ResourceController
 
     public function delete($id=null)
     {
+        if (!is_numeric($id)) {
+            return $this->failValidationErrors([
+            'id' => 'Invalid ID'
+        ]);
+        }
+        if (! $this->model->find($id)) {
+            return $this->failNotFound('Category not found');
+        }
         $todo = new TodoModel();
 
         if ($todo->where('category_id',$id)->countAllResults()>0) {

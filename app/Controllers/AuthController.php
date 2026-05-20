@@ -10,7 +10,15 @@ class AuthController extends ResourceController
     {
         helper('jwt');
 
-        $token = create_jwt(['user'=>'admin']);
+        $data = $this->request->getJSON(true);
+
+    if ($data['username'] !== 'admin' || $data['password'] !== '1234') {
+        return $this->failUnauthorized('Invalid credentials');
+    }
+
+        $token = create_jwt([
+            'user' => $data['username']
+        ]);
 
         return $this->respond(['token'=>$token]);
     }
