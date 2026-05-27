@@ -15,11 +15,11 @@ tags:
   - name: Categories
   - name: System
 
-# =====================================================
-# AUTH
-# =====================================================
-
 paths:
+
+  # =====================================================
+  # AUTH
+  # =====================================================
 
   /login:
     post:
@@ -37,7 +37,9 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email, password]
+              required:
+                - email
+                - password
               properties:
                 email:
                   type: string
@@ -53,7 +55,6 @@ paths:
             application/json:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6...
-
         "401":
           description: Login fehlgeschlagen
           content:
@@ -85,7 +86,6 @@ paths:
                 id: 1
                 email: test@test.ch
                 username: testuser
-
         "401":
           description: Ungültiger oder fehlender Token
           content:
@@ -109,8 +109,6 @@ paths:
         - Beschreibung
         - Status (completed)
         - Kategorie-ID
-
-        Es werden keine Parameter benötigt.
       responses:
         "200":
           description: Erfolgreiche Abfrage
@@ -129,14 +127,26 @@ paths:
       description: |
         Erstellt ein neues Todo in der Datenbank.
 
-        Die Daten werden im JSON Format im Request Body übergeben.
-        Pflichtfelder sind title und category_id.
-
-        Optional können description und completed gesetzt werden.
+        Pflichtfelder: title, category_id
+        Optional: description, completed
       requestBody:
         required: true
         content:
           application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - category_id
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                completed:
+                  type: boolean
+                category_id:
+                  type: integer
             example:
               title: Projekt fertigstellen
               description: API Dokumentation schreiben
@@ -154,10 +164,7 @@ paths:
     get:
       tags: [Todos]
       summary: Todo nach ID abrufen
-      description: |
-        Gibt ein einzelnes Todo anhand der ID zurück.
-
-        Die ID wird im URL Pfad übergeben.
+      description: Gibt ein einzelnes Todo anhand der ID zurück
       parameters:
         - name: id
           in: path
@@ -177,10 +184,7 @@ paths:
     put:
       tags: [Todos]
       summary: Todo aktualisieren
-      description: |
-        Aktualisiert ein bestehendes Todo anhand der ID.
-
-        Die neuen Werte werden im JSON Body übergeben.
+      description: Aktualisiert ein bestehendes Todo anhand der ID
       parameters:
         - name: id
           in: path
@@ -207,9 +211,6 @@ paths:
       summary: Todo löschen
       description: |
         Löscht ein Todo anhand der übergebenen ID.
-
-        Die ID wird im URL Pfad übergeben und identifiziert
-        den Datensatz eindeutig in der Datenbank.
       parameters:
         - name: id
           in: path
@@ -223,7 +224,6 @@ paths:
             application/json:
               example:
                 message: Todo wurde gelöscht
-
         "404":
           description: Todo nicht gefunden
           content:
@@ -239,7 +239,7 @@ paths:
     get:
       tags: [Categories]
       summary: Alle Kategorien abrufen
-      description: Gibt alle vorhandenen Kategorien aus der Datenbank zurück
+      description: Gibt alle Kategorien zurück
       responses:
         "200":
           description: Erfolgreiche Abfrage
@@ -252,27 +252,30 @@ paths:
     post:
       tags: [Categories]
       summary: Kategorie erstellen
-      description: Erstellt eine neue Kategorie mit Namen
+      description: Erstellt eine neue Kategorie
       requestBody:
         required: true
         content:
           application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  minLength: 2
             example:
               name: Arbeit
       responses:
         "201":
           description: Kategorie erstellt
-    
-      /categories/{id}:
+
+  /categories/{id}:
     delete:
       tags: [Categories]
       summary: Kategorie löschen
-      description: |
-        Löscht eine Kategorie nur wenn sie keine Todos enthält.
-
-        - 400 wenn ID der Kategorie ungültig ist
-        - 404 wenn Kategorie nicht existiert
-        - 409 wenn Kategorie noch Todos enthält
+      description: Löscht eine Kategorie nur, wenn sie leer ist und die ID vorhanden ist.
       parameters:
         - name: id
           in: path
@@ -285,27 +288,19 @@ paths:
           content:
             application/json:
               example:
-                message: Kategorie erfolgreich gelöscht.
-        "400":
-            description: Ungültige ID
-            content:
-              application/json:
-                example:
-                  id: Ungültige ID
-
-        "409":
-          description: Kategorie nicht leer
-          content:
-            application/json:
-              example:
-                error: Kategorie nicht leer
-
+                message: Kategorie erfolgreich gelöscht
         "404":
           description: Kategorie nicht gefunden
           content:
             application/json:
               example:
-                error: Kategorie nicht gefunden
+                message: Kategorie nicht gefunden
+        "409":
+          description: Kategorie nicht leer
+          content:
+            application/json:
+              example:
+                message: Kategorie nicht leer
 
   # =====================================================
   # API KEYS
@@ -315,7 +310,7 @@ paths:
     get:
       tags: [System]
       summary: API Keys anzeigen
-      description: Gibt alle gespeicherten API Keys zurück
+      description: Gibt alle API Keys zurück
       responses:
         "200":
           description: Liste der API Keys
@@ -334,7 +329,7 @@ paths:
     get:
       tags: [System]
       summary: API Logs abrufen
-      description: Gibt alle API Requests aus dem Log System zurück
+      description: Gibt alle Logs zurück
       responses:
         "200":
           description: Log Liste
@@ -348,7 +343,6 @@ paths:
                   api_key: abc123
 
 components:
-
   securitySchemes:
     bearerAuth:
       type: http
@@ -363,8 +357,7 @@ x-project-feedback: |
   Unserer Meinung nach hat das Projekt Spass gemacht, und es war nicht so kompliziert, wie wir anfangs gedacht hatten.
   Das Verständnis für HTTP-Methoden und JSON Datenübertragung hat sich bei uns beiden verbessert.
   Gut gelungen ist unsere Projektstruktur und das Zusammenarbeiten im Team.
-  Herausfordernd war das Debugging bei Fehlerhaften Requests sowie die Unit Tests zu schreiben.
+  Herausfordernd war das Debugging bei fehlerhaften Requests sowie die Unit Tests zu schreiben.
   Bei diesem üK hatten wir nicht so Zeitmangel wie beim vorherigen, da wir alles besser eingeplant haben.
-  Geplant war eigentlich, dass wir dieses Projekt zusammen mit Fabian bearbeitet hätten, aber aufgrund seiner Absenz 
-  haben wir es zu zweit machen müssen.
+  Geplant war eigentlich, dass wir dieses Projekt zusammen mit Fabian bearbeitet hätten, aber aufgrund seiner Absenz haben wir es zu zweit machen müssen.
   Im Grossen und Ganzen war das eine positive Erfahrung für uns und wir haben viel Neues dazugelernt.

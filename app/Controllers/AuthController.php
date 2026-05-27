@@ -13,7 +13,7 @@ class AuthController extends ResourceController
         $data = $this->request->getJSON(true);
 
     if ($data['username'] !== 'admin' || $data['password'] !== '1234') {
-        return $this->failUnauthorized('Invalid credentials');
+        return $this->failUnauthorized('Ungültige Zugangsdaten');
     }
 
         $token = create_jwt([
