@@ -262,6 +262,50 @@ paths:
       responses:
         "201":
           description: Kategorie erstellt
+    
+      /categories/{id}:
+    delete:
+      tags: [Categories]
+      summary: Kategorie löschen
+      description: |
+        Löscht eine Kategorie nur wenn sie keine Todos enthält.
+
+        - 400 wenn ID der Kategorie ungültig ist
+        - 404 wenn Kategorie nicht existiert
+        - 409 wenn Kategorie noch Todos enthält
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Kategorie gelöscht
+          content:
+            application/json:
+              example:
+                message: Kategorie erfolgreich gelöscht.
+        "400":
+            description: Ungültige ID
+            content:
+              application/json:
+                example:
+                  id: Ungültige ID
+
+        "409":
+          description: Kategorie nicht leer
+          content:
+            application/json:
+              example:
+                error: Kategorie nicht leer
+
+        "404":
+          description: Kategorie nicht gefunden
+          content:
+            application/json:
+              example:
+                error: Kategorie nicht gefunden
 
   # =====================================================
   # API KEYS
