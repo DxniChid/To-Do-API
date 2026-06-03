@@ -69,29 +69,53 @@ paths:
   /user:
     get:
       tags: [User]
-      summary: Aktuellen Benutzer abrufen
+      summary: Aktuellen Benutzer abrufen (JWT geschützt)
       description: |
         Gibt die Daten des aktuell eingeloggten Benutzers zurück.
 
-        Zugriff ist nur mit gültigem JWT Token möglich,
-        welches im Authorization Header gesendet werden muss.
+        Der Zugriff ist nur mit einem gültigen JWT Token möglich.
+        Dieses muss im Authorization Header als Bearer Token gesendet werden.
+
+        Ablauf im Backend:
+        - Authorization Header wird geprüft
+        - JWT Token wird validiert
+        - User ID wird aus Token gelesen
+        - User wird aus Datenbank geladen
+
+        Fehler werden direkt aus dem Auth-Prozess zurückgegeben.
       security:
         - bearerAuth: []
+
       responses:
         "200":
-          description: Benutzer gefunden
+          description: Benutzer erfolgreich gefunden
           content:
             application/json:
               example:
                 id: 1
                 email: test@test.ch
                 username: testuser
+
         "401":
-          description: Ungültiger oder fehlender Token
+          description: Unauthorized (alle Auth-Fehler)
           content:
             application/json:
-              example:
-                message: Invalid token
+              examples:
+
+                missing_or_invalid_header:
+                  summary: Fehlender oder ungültiger Authorization Header
+                  value:
+                    message: Missing or invalid Authorization header
+
+                invalid_token:
+                  summary: Token ist ungültig oder abgelaufen
+                  value:
+                    message: Invalid token
+
+                user_not_found:
+                  summary: Benutzer existiert nicht mehr in der Datenbank
+                  value:
+                    message: User not found
 
   # =====================================================
   # TODOS
