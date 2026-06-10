@@ -1,4 +1,4 @@
-# Gruppenmitglieder:
+# Gruppenmitglieder
 
   Imhof Patrick
   Chidiroglou Danai
