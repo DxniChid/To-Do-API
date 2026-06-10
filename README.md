@@ -1,11 +1,18 @@
 # Gruppenmitglieder:
-Imhof Patrick
-Chidiroglou Danai
+
+  Imhof Patrick
+  Chidiroglou Danai
 
 
 # Dokumentation
-Unsere Doku wurde mit OpenApi geschrieben (siehe openapi.yaml und openapi.html in
-diesem Verzeichnis).
+
+  Unsere Doku wurde mit OpenApi geschrieben (siehe openapi.yaml und openapi.html im public Verzeichnis).
+  Auf openapi.html gehen und dann unten rechts auf "Go Live" drücken, um die Dokumentation im Browser anzusehen anhand vom Live Server.
+
+# Link zur API
+
+  http://localhost:8080/api
+
 
 # Persönliches Feedback
 
