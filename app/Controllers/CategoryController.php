@@ -19,6 +19,8 @@ class CategoryController extends ResourceController
 public function create()
 {
     $data = $this->request->getJSON(true);
+    
+    // log_message(...) moved here if you still want it
 
     if (!isset($data['name']) || strlen(trim($data['name'])) < 2) {
         return $this->failValidationErrors([
@@ -28,10 +30,13 @@ public function create()
 
     $data['name'] = trim(strip_tags($data['name']));
 
-    $this->model->insert($data);
+    // 1. Capture the ID returned by insert()
+    $id = $this->model->insert($data);
 
+    // 2. Return the ID in the response so your test can find it
     return $this->respondCreated([
-        'message' => 'Kategorie erstellt '
+        'id' => $id,
+        'message' => 'Kategorie erstellt'
     ]);
 }
     public function delete($id=null)
